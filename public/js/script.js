@@ -1,3 +1,4 @@
+// Form validation and submission
 const form = document.getElementById('registrationForm');
 
 form.addEventListener('submit', async (e) => {
@@ -26,7 +27,8 @@ form.addEventListener('submit', async (e) => {
     }
     
     // Password validation
-    if (formData.get('password').length < 8) {
+    const password = formData.get('password');
+    if (password.length < 8) {
         document.getElementById('passwordError').style.display = 'block';
         isValid = false;
     }
@@ -42,14 +44,16 @@ form.addEventListener('submit', async (e) => {
         try {
             const response = await fetch('/register', {
                 method: 'POST',
-                body: formData // FormData automatically sets the correct Content-Type
+                body: formData
             });
             
             const result = await response.json();
             
             if (result.success) {
-                alert('Registration successful!');
+                alert('Registration successful! Please login.');
                 form.reset();
+                // Optionally redirect to login page
+                // window.location.href = '/login.html';
             } else {
                 alert(result.error || 'Registration failed. Please try again.');
             }
@@ -59,3 +63,41 @@ form.addEventListener('submit', async (e) => {
         }
     }
 });
+
+// Login form handler (if you have a separate login form)
+const loginForm = document.getElementById('loginForm');
+
+if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(loginForm);
+        const loginData = {
+            email: formData.get('email'),
+            password: formData.get('password')
+        };
+        
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(loginData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Login successful!');
+                // Redirect to dashboard or home page
+                // window.location.href = '/dashboard.html';
+            } else {
+                alert(result.error || 'Login failed. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred during login. Please try again.');
+        }
+    });
+}
